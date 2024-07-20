@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: Cookify API
+  version: 1.0.0
+  description: An Express API for Cookify
+servers:
+  - url: http://localhost:5000
+    description: Local server
+  - url: https://prod:5000
+    description: Live server
+paths:
+  /:
+    get:
+      summary: Get the home page
+      responses:
+        "200":
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello World!
+  /ping:
+    get:
+      summary: Ping the server
+      responses:
+        "200":
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Pong
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
