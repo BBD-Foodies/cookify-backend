@@ -7,7 +7,6 @@ const {
     getRecipeById
 } = require('../Controllers/recipeController');
 const { recipeQueryValidators, validateObjectId } = require('../utils/validationUtils');
-const verifyToken = require("../middleware/authMiddleware");
 const router = express.Router();
 
 
@@ -17,7 +16,7 @@ router.get('/group', getGroupedRecipes);
 
 router.get('/:id', validateObjectId, getRecipeById);
 
-router.post('/', verifyToken, recipeQueryValidators(), addRecipes);
+router.post('/', recipeQueryValidators(), addRecipes);
 
 router.get('/', getRecipesByFilters);
 
