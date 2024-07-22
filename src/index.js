@@ -26,7 +26,7 @@ const swaggerDocument = YAML.load('./swagger/swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-app.get('/', verifyToken, (req, res) => {
+app.get('/health-check', verifyToken, (req, res) => {
     if (!dbConnected) {
         console.log(`Here's the name: ${req.userName}`)
         return res.status(500).send('Hello World! But DB is NOT connected.');
@@ -41,8 +41,7 @@ app.get('/ping', (req, res) => {
 
 app.use('/api',  authRoutes);
 
-
-app.use('/api/recipes', recipeRoutes);
+app.use('/api/recipes', verifyToken, recipeRoutes);
 
 
 app.listen(port, () => {
