@@ -3,47 +3,60 @@ db = db.getSiblingDB('foodiedb');
 db.recipes.drop();
 db.recipes.insertMany([
     {
-        title: "Chocolate Chip Cookies",
-        ingredients: [
-            { number: 2, size: 100, unit: "grams", extra: "chopped" },
-            { number: 1, size: 200, unit: "grams", extra: "none" }
+        RecipeName: "Chocolate Chip Cookies",
+        Ingredients: [
+            { name: "Chocolate Chips", quantity: 200, measurement: "g" },
+            { name: "Flour", quantity: 300, measurement: "g" },
+            { name: "Butter", quantity: 100, measurement: "g" },
+            { name: "Sugar", quantity: 150, measurement: "g" }
         ],
-        mealType: "Dessert",
-        mealTimeOfDay: "Snack",
-        preparationTime: "00:10:00",
-        cookingTime: "00:20:00",
-        servings: 4,
-        nutritionInformation: "High calories",
-        instructions: "Mix all ingredients and bake.",
-        materialsNeeded: "Bowl, oven",
-        dietaryType: "None",
-        tags: ["sweet", "baking"],
-        story: "A classic treat for any occasion.",
-        FAQ: [
-            { question: "Can I use less sugar?", answer: "Yes, but adjust baking time accordingly." }
+        ServingSize: 4,
+        PrepTimeMin: 10,
+        PrepTimeMax: 20,
+        Categories: ["Dessert", "Snack"],
+        Allergens: [],
+        DietaryRequirements: [],
+        RequiredCookware: ["Bowl", "Oven"],
+        MealType: "Dessert",
+        Steps: [
+            { step: 1, instruction: "Mix all dry ingredients except sugar." },
+            { step: 2, instruction: "Cream butter and sugar together." },
+            { step: 3, instruction: "Combine all ingredients and form dough." },
+            { step: 4, instruction: "Place dough on baking sheet and bake." }
         ]
     },
     {
-        title: "Caesar Salad",
-        ingredients: [
-            { number: 1, size: 1, unit: "bunch", extra: "washed and torn" },
-            { number: 2, size: 50, unit: "grams", extra: "grated" }
+        AuthorName: "Thato-Tladi",
+        RecipeName: "Caesar Salad",
+        Ingredients: [
+            { name: "Romaine Lettuce", quantity: 1, measurement: "bunch" },
+            { name: "Parmesan Cheese", quantity: 50, measurement: "g" },
+            { name: "Croutons", quantity: 30, measurement: "g" },
+            { name: "Caesar Dressing", quantity: 20, measurement: "ml" }
         ],
-        mealType: "Salad",
-        mealTimeOfDay: "Lunch",
-        preparationTime: "00:15:00",
-        cookingTime: "00:00:00",
-        servings: 2,
-        nutritionInformation: "Low calories",
-        instructions: "Toss all ingredients in a large bowl.",
-        materialsNeeded: "Bowl, salad tossers",
-        dietaryType: "Vegetarian",
-        tags: ["healthy", "quick"],
-        story: "Perfect for a quick, healthy lunch.",
-        FAQ: [
-            { question: "Can I add chicken?", answer: "Yes, add grilled chicken for extra protein." }
+        ServingSize: 2,
+        PrepTimeMin: 15,
+        PrepTimeMax: 15,
+        Categories: ["Salad", "Lunch"],
+        Allergens: ["Dairy"],
+        DietaryRequirements: ["Vegetarian"],
+        RequiredCookware: ["Bowl", "Salad Tossers"],
+        MealType: "Lunch",
+        Steps: [
+            { step: 1, instruction: "Wash and tear the lettuce into pieces." },
+            { step: 2, instruction: "Add croutons and Parmesan cheese." },
+            { step: 3, instruction: "Drizzle Caesar dressing and toss the salad." }
         ]
     }
 ]);
+
+
+// Create or update the user with readWrite access to the 'foodiedb'
+db.createUser({
+    user: "root",
+    pwd: "password",  // Choose a secure password
+    roles: [{ role: "readWrite", db: "foodiedb" }],
+    passwordDigestor: "server"
+});
 
 print('Dummy data inserted into database.');
