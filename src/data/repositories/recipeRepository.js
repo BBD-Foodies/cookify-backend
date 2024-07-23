@@ -31,7 +31,13 @@ const findByFilters = (filters) => {
     const query = {};
     Object.keys(filters).forEach(key => {
         if (filters[key]) {
-            query[key] = filters[key];
+            if(key.endsWith('_lt') || key.endsWith('_gt')){
+                const field = key.slice(0, -3);
+                const operator = key.endsWith('_lt') ? '$lt' : '$gt';
+                query[field] = { [operator]: filters[key] };
+            }
+            else 
+                query[key] = filters[key];
         }
     });
     return Recipe.find(query);
