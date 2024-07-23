@@ -30,18 +30,22 @@ const searchRecipes = async (searchQuery) => {
 const findByFilters = (filters) => {
     const query = {};
     Object.keys(filters).forEach(key => {
-        if (filters[key]) {
-            if(key.endsWith('_lt') || key.endsWith('_gt')){
-                const field = key.slice(0, -3);
-                const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                query[field] = { [operator]: filters[key] };
+        const values = filters[key].split(','); // handle arrays of values 
+        values.forEach(value => {
+            if (value) {
+                if (key.endsWith('_lt') || key.endsWith('_gt')) {
+                    const field = key.slice(0, -3);
+                    const operator = key.endsWith('_lt') ? '$lt' : '$gt';
+                    query[field] = { [operator]: value };
+                } else if (key === 'Allergens') {
+                    if (!query[key]) query[key] = { '$nin': [] };
+                    query[key]['$nin'].push(value);
+                } else {
+                    if (!query[key]) query[key] = { '$all': [] };
+                    query[key]['$all'].push(value);
+                }
             }
-            else if (key.match('Allergens')) {
-                query[key] = { '$ne': filters[key] }; 
-            }
-            else 
-                query[key] = filters[key];
-        }
+        });
     });
     return Recipe.find(query);
 };
