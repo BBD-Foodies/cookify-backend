@@ -36,6 +36,9 @@ const findByFilters = (filters) => {
                 const operator = key.endsWith('_lt') ? '$lt' : '$gt';
                 query[field] = { [operator]: filters[key] };
             }
+            else if (key.match('Allergens')) {
+                query[key] = { '$ne': filters[key] }; 
+            }
             else 
                 query[key] = filters[key];
         }
