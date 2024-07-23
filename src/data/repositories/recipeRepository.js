@@ -39,16 +39,20 @@ const findByFilters = (filters) => {
                     query[field] = { [operator]: value };
                 } else if (key.endsWith('!')) {
                     const field = key.slice(0, -1);
-                    if (!query[field]) query[field] = { '$nin': [] };
-                    query[field]['$nin'].push(value);
+                    addQueryCondition(query, field, '$nin', value);
                 } else {
-                    if (!query[key]) query[key] = { '$all': [] };
-                    query[key]['$all'].push(value);
+                    addQueryCondition(query, key, '$in', value);
                 }
             }
         });
     });
     return Recipe.find(query);
+};
+
+const addQueryCondition = (query, field, operator, value) => {
+    if (!query[field]) query[field] = {};
+    if (!query[field][operator]) query[field][operator] = [];
+    query[field][operator].push(value);
 };
 
 const groupByAttribute = (attribute) => {
