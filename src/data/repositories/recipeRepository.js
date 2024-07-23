@@ -37,9 +37,10 @@ const findByFilters = (filters) => {
                     const field = key.slice(0, -3);
                     const operator = key.endsWith('_lt') ? '$lt' : '$gt';
                     query[field] = { [operator]: value };
-                } else if (key === 'Allergens') {
-                    if (!query[key]) query[key] = { '$nin': [] };
-                    query[key]['$nin'].push(value);
+                } else if (key.endsWith('!')) {
+                    const field = key.slice(0, -1);
+                    if (!query[field]) query[field] = { '$nin': [] };
+                    query[field]['$nin'].push(value);
                 } else {
                     if (!query[key]) query[key] = { '$all': [] };
                     query[key]['$all'].push(value);
