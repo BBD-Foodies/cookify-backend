@@ -1,3 +1,4 @@
+const { pagination } = require('../../Services/PaginationService');
 const Recipe = require('../models/Recipe');
 
 const addRecipe = async (recipeData) => {
@@ -18,23 +19,26 @@ const findRecipeById = async (recipeId) => {
     }
 };
 
-const searchRecipes = async (searchQuery) => {
-    return Recipe.find(
-        { $text: { $search: searchQuery } },
-        { score: { $meta: "textScore" } }
-    ).sort({
-        score: { $meta: "textScore" }
-    });
+const searchRecipes = async (searchQuery, req) => {
+    return pagination(
+        Recipe.find(
+            { $text: { $search: searchQuery } },
+            { score: { $meta: "textScore" } }
+        ).sort({
+            score: { $meta: "textScore" }
+        }), 
+        req
+    );
 };
 
-const findByFilters = (filters) => {
+const findByFilters = (filters, req) => {
     const query = {};
     Object.keys(filters).forEach(key => {
         if (filters[key]) {
             query[key] = filters[key];
         }
     });
-    return Recipe.find(query);
+    return pagination(Recipe.find(query), req)
 };
 
 const groupByAttribute = (attribute) => {

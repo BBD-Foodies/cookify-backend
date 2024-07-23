@@ -50,7 +50,7 @@ const deleteRecipeById = async (req, res) => {
 const searchRecipe = async (req, res) => {
     try {
         const searchQuery = req.query.q;
-        const recipes = await searchRecipes(searchQuery);
+        const recipes = await searchRecipes(searchQuery, req)
 
         if (!recipes.length) {
             return res.status(404).send({ message: 'No recipes found matching your criteria.' });
@@ -71,7 +71,7 @@ const getRecipesByFilters = async (req, res) => {
 
     try {
         const filters = req.query;
-        const recipes = await findByFilters(filters);
+        const recipes = await findByFilters(filters, req);
         res.json(recipes);
     } catch (error) {
         res.status(500).json({ message: error.message });
