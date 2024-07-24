@@ -33,20 +33,28 @@ const findByFilters = (filters) => {
         const values = filters[key].split(','); // handle arrays of values 
         values.forEach(value => {
             if (value) {
-                if (key.endsWith('_lt') || key.endsWith('_gt')) {
-                    const field = key.slice(0, -3);
-                    const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                    query[field] = { [operator]: value };
-                } else if (key.endsWith('!')) {
-                    const field = key.slice(0, -1);
-                    addQueryCondition(query, field, '$nin', value);
-                } else {
-                    addQueryCondition(query, key, '$in', value);
-                }
+                handleCondition(query, key, value);
             }
         });
     });
     return Recipe.find(query);
+};
+
+const handleCondition = (query, key, value) => {
+    if (key === 'Ingredients') {
+        query[key] = { $elemMatch: { name: { $regex: value, $options: 'i' } } };
+    } else if (key === 'Ingredients!') {
+        query[key.slice(0, -1)] = { $not: { $elemMatch: { name: { $regex: value, $options: 'i' } } } };
+    } else if (key.endsWith('_lt') || key.endsWith('_gt')) {
+        const field = key.slice(0, -3);
+        const operator = key.endsWith('_lt') ? '$lt' : '$gt';
+        query[field] = { [operator]: value };
+    } else if (key.endsWith('!')) {
+        const field = key.slice(0, -1);
+        addQueryCondition(query, field, '$nin', value);
+    } else {
+        addQueryCondition(query, key, '$in', value);
+    }
 };
 
 const addQueryCondition = (query, field, operator, value) => {
