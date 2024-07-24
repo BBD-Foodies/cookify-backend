@@ -42,9 +42,9 @@ const findByFilters = (filters) => {
 
 const handleCondition = (query, key, value) => {
     if (key === 'Ingredients') {
-        query[key] = { $elemMatch: { name: { $regex: value, $options: 'i' } } };
+        query[key] = { $elemMatch: { name: value } };
     } else if (key === 'Ingredients!') {
-        query[key.slice(0, -1)] = { $not: { $elemMatch: { name: { $regex: value, $options: 'i' } } } };
+        query[key.slice(0, -1)] = { $not: { $elemMatch: { name: value } } };
     } else if (key.endsWith('_lt') || key.endsWith('_gt')) {
         const field = key.slice(0, -3);
         const operator = key.endsWith('_lt') ? '$lt' : '$gt';
