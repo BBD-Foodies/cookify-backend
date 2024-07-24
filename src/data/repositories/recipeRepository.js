@@ -27,28 +27,47 @@ const searchRecipes = async (searchQuery) => {
     });
 };
 
+const updateRecipeById = async (id, updateData, userName) => {
+    const recipe = await Recipe.findOne({ _id: id });
+    if (!recipe) {
+        return { status: 'not_found', data: null };
+    }
+    if (recipe.AuthorName !== userName) {
+        return { status: 'unauthorized', data: null };
+    }
+
+    Object.assign(recipe, updateData);
+    const savedRecipe = await recipe.save();
+    return { status: 'success', data: savedRecipe };
+};
+
 const findByFilters = (filters) => {
     const query = {};
     Object.keys(filters).forEach(key => {
-        const values = filters[key].split(','); // handle arrays of values 
+        const values = filters[key].split(',');
         values.forEach(value => {
             if (value) {
+                if (key.startsWith('Ingredients')) {
+                    if (key.endsWith('!')) {
+                        key = "Ingredients.name!"
+                    }
+                    else { key = "Ingredients.name" }
+                }
                 if (key.endsWith('_lt') || key.endsWith('_gt')) {
                     const field = key.slice(0, -3);
                     const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                    query[field] = { [operator]: value };
+                    addQueryCondition(query, field, operator, Number(value));
                 } else if (key.endsWith('!')) {
                     const field = key.slice(0, -1);
                     addQueryCondition(query, field, '$nin', value);
                 } else {
-                    addQueryCondition(query, key, '$in', value);
+                    addQueryCondition(query, key, '$all', value, true);
                 }
             }
         });
     });
     return Recipe.find(query);
-};
-
+}
 const addQueryCondition = (query, field, operator, value) => {
     if (!query[field]) query[field] = {};
     if (!query[field][operator]) query[field][operator] = [];
@@ -76,6 +95,7 @@ const groupByAttribute = (attribute) => {
 
 
 module.exports = {
+    updateRecipeById,
     findRecipeById,
     searchRecipes,
     addRecipe,

@@ -1,7 +1,8 @@
-const { query, validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+const { body, query } = require('express-validator');
+const { MEAL_TYPE_ENUMS, MEASUREMENT_ENUMS, VALID_FIELDS, GROUP_BY_FIELDS } = require('../data/config/enums');
 
-const recipeQueryValidators = () => [
+
+const recipeValidationRules = () => [
     query('recipeName').optional().isString().trim().escape(),
     query('categories').optional().isString().trim().escape(),
     query('mealType').optional().isString().trim().escape(),
@@ -13,24 +14,38 @@ const recipeQueryValidators = () => [
     query('prepTimeMax').optional().isNumeric(),
 ];
 
-const validate = (req) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return errors.array();
-    }
-    return null;
-};
+const updateRecipeValidationRules = () => [
+    body('recipeName').optional().isString().trim().escape(),
+    body('categories').optional().isString().trim().escape(),
+    body('mealType').optional().isString().trim().escape(),
+    body('allergens').optional().isString().trim().escape(),
+    body('dietaryRequirements').optional().isString().trim().escape(),
+    body('servingSize').optional().isNumeric(),
+    body('prepTimeMin').optional().isNumeric(),
+    body('prepTimeMax').optional().isNumeric(),
+];
 
-const validateObjectId = (req, res, next) => {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "Invalid recipe ID format" });
-    }
-    next();
-};
+const filterRecipeValidationRules = () => [
+    query('*').custom((value, { path }) => {
+        if (!VALID_FIELDS.includes(path.replace(/_[lg]t$/, '').replace(/!$/, ''))) {
+            throw new Error(`Invalid filter parameter: ${path}`);
+        }
+        return true;
+    }),
+    query('MealType').optional().isIn(MEAL_TYPE_ENUMS),
+    query('Ingredients.*.measurement').optional().isIn(MEASUREMENT_ENUMS),
+
+];
+
+
+const groupByValidationRules = () => [
+    query('attribute').exists().withMessage('Grouping attribute is required')
+                     .isIn(GROUP_BY_FIELDS).withMessage('Invalid grouping attribute')
+];
 
 module.exports = {
-    validateObjectId,
-    recipeQueryValidators,
-    validate
+    groupByValidationRules,
+    filterRecipeValidationRules,
+    recipeValidationRules,
+    updateRecipeValidationRules
 };
