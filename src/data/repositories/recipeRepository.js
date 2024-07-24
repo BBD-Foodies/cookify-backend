@@ -30,17 +30,29 @@ const searchRecipes = async (searchQuery) => {
 const findByFilters = (filters) => {
     const query = {};
     Object.keys(filters).forEach(key => {
-        if (filters[key]) {
-            if(key.endsWith('_lt') || key.endsWith('_gt')){
-                const field = key.slice(0, -3);
-                const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                query[field] = { [operator]: filters[key] };
+        const values = filters[key].split(','); // handle arrays of values 
+        values.forEach(value => {
+            if (value) {
+                if (key.endsWith('_lt') || key.endsWith('_gt')) {
+                    const field = key.slice(0, -3);
+                    const operator = key.endsWith('_lt') ? '$lt' : '$gt';
+                    query[field] = { [operator]: value };
+                } else if (key.endsWith('!')) {
+                    const field = key.slice(0, -1);
+                    addQueryCondition(query, field, '$nin', value);
+                } else {
+                    addQueryCondition(query, key, '$in', value);
+                }
             }
-            else 
-                query[key] = filters[key];
-        }
+        });
     });
     return Recipe.find(query);
+};
+
+const addQueryCondition = (query, field, operator, value) => {
+    if (!query[field]) query[field] = {};
+    if (!query[field][operator]) query[field][operator] = [];
+    query[field][operator].push(value);
 };
 
 const groupByAttribute = (attribute) => {
