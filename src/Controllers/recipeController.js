@@ -1,4 +1,4 @@
-const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, updateRecipeById } = require('../data/repositories/recipeRepository');
+const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, updateRecipeById, deleteRecipe } = require('../data/repositories/recipeRepository');
 const { validate } = require('../utils/validationUtils');
 
 const addRecipes = async (req, res) => {
@@ -54,15 +54,20 @@ const updateRecipe = async (req, res) => {
 };
 
 const deleteRecipeById = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const recipeId = req.params.id;
-        const result = await Recipe.findByIdAndRemove(recipeId);
-
-        if (!result) {
-            return res.status(404).json({ message: 'Recipe not found' });
+        const result = await deleteRecipe(id, req.userName);
+        switch (result) {
+            case 'success':
+                return res.json({ message: "Recipe deleted successfully" });
+            case 'not_found':
+                return res.status(404).json({ message: 'Recipe not found' });
+            case 'unauthorized':
+                return res.status(403).json({ message: 'Unauthorized: You can only delete your own recipes' });
+            default:
+                return res.status(500).json({ message: "Error deleting the recipe" });
         }
-
-        res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: "Error deleting the recipe", error: error.message });
     }
@@ -71,7 +76,7 @@ const deleteRecipeById = async (req, res) => {
 const searchRecipe = async (req, res) => {
     try {
         const searchQuery = req.query.q;
-        const recipes = await searchRecipes(searchQuery);
+        const recipes = await searchRecipes(searchQuery, req)
 
         if (!recipes.length) {
             return res.status(404).send({ message: 'No recipes found matching your criteria.' });
@@ -84,10 +89,10 @@ const searchRecipe = async (req, res) => {
     }
 };
 
-getRecipesByFilters = async (req, res) => {
+const getRecipesByFilters = async (req, res) => {
     try {
         const filters = req.query;
-        const recipes = await findByFilters(filters);
+        const recipes = await findByFilters(filters, req);
         res.json({ message: "Recipes retrieved successfully", data: recipes });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving recipes", error: error.message });

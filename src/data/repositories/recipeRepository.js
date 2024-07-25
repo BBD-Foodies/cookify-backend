@@ -1,3 +1,4 @@
+const { pagination } = require('../../Services/PaginationService');
 const Recipe = require('../models/Recipe');
 
 const addRecipe = async (recipeData) => {
@@ -18,13 +19,29 @@ const findRecipeById = async (recipeId) => {
     }
 };
 
-const searchRecipes = async (searchQuery) => {
-    return Recipe.find(
-        { $text: { $search: searchQuery } },
-        { score: { $meta: "textScore" } }
-    ).sort({
-        score: { $meta: "textScore" }
-    });
+const searchRecipes = async (searchQuery, req) => {
+    return pagination(
+        Recipe.find(
+            { $text: { $search: searchQuery } },
+            { score: { $meta: "textScore" } }
+        ).sort({
+            score: { $meta: "textScore" }
+        }), 
+        req
+    );
+};
+
+const deleteRecipe = async (id, userName) => {
+    const recipe = await Recipe.findOne({ _id: id });
+    if (!recipe) {
+        return 'not_found';
+    }
+    if (recipe.AuthorName !== userName) {
+        return 'unauthorized';
+    }
+
+    const result = await Recipe.findByIdAndDelete(id);
+    return (result) ? 'success' : 'error'
 };
 
 const updateRecipeById = async (id, updateData, userName) => {
@@ -41,7 +58,8 @@ const updateRecipeById = async (id, updateData, userName) => {
     return { status: 'success', data: savedRecipe };
 };
 
-const findByFilters = (filters) => {
+
+const findByFilters = (filters, req) => {
     const query = {};
     Object.keys(filters).forEach(key => {
         const values = filters[key].split(',');
@@ -66,8 +84,9 @@ const findByFilters = (filters) => {
             }
         });
     });
-    return Recipe.find(query);
-}
+    return pagination(Recipe.find(query), req)
+};
+
 const addQueryCondition = (query, field, operator, value) => {
     if (!query[field]) query[field] = {};
     if (!query[field][operator]) query[field][operator] = [];
@@ -100,5 +119,6 @@ module.exports = {
     searchRecipes,
     addRecipe,
     findByFilters,
-    groupByAttribute
+    groupByAttribute,
+    deleteRecipe
 };

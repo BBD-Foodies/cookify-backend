@@ -1,17 +1,20 @@
 const { validationResult } = require('express-validator');
-const { recipeValidationRules, updateRecipeValidationRules, filterRecipeValidationRules, groupByValidationRules } = require('../utils/validationUtils');
+const { updateRecipeValidationRules, postRecipeValidationRules, filterRecipeValidationRules, groupByValidationRules } = require('../utils/validationUtils');
 const mongoose = require('mongoose');
 
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ message: "Invalid format given. Please check your input." });
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: errors.array({ onlyFirstError: true })
+        });
     }
     next();
 };
 
-const recipeQueryValidators = [
-    ...recipeValidationRules(),
+const postRecipeValidators = [
+    ...postRecipeValidationRules(),
     handleValidationErrors
 ];
 
@@ -52,7 +55,7 @@ const groupByValidators = [
 module.exports = {
     groupByValidators,
     filterRecipeValidators,
-    recipeQueryValidators,
+    postRecipeValidators,
     updateRecipeValidators,
     validateObjectId
 };

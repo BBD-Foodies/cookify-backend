@@ -2,8 +2,8 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const connectDatabase = require('./data/dbConfig'); // Import the DB configuration
-const recipeRoutes = require('./routes/recipeRoutes'); // Import the recipe routes
-const authRoutes = require('./routes/authRoutes');
+const recipeRoutes = require('./Routes/recipeRoutes'); // Import the recipe routes
+const authRoutes = require('./Routes/authRoutes');
 const verifyToken = require( "./Middleware/authMiddleware");
 
 const app = express();
