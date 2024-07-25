@@ -68,7 +68,7 @@ const updateRecipeById = async (id, updateData, userName) => {
 };
 
 
-const findByFilters = async (filters, req) => {
+findByFilters = async (filters, req) => {
     const query = {};
 
     Object.keys(filters).forEach(key => {
@@ -81,7 +81,6 @@ const findByFilters = async (filters, req) => {
         values.forEach(value => {
             if (!value) return;
 
-            // Handle Ingredients fields
             if (key.startsWith('Ingredients')) {
                 key = key.endsWith('!') ? 'Ingredients.name!' : 'Ingredients.name';
             }
@@ -90,22 +89,20 @@ const findByFilters = async (filters, req) => {
             if (key.endsWith('_lt') || key.endsWith('_gt')) {
                 const field = key.slice(0, -3);
                 const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                if (!query[field]) query[field] = {};
-                query[field][operator] = Number(value);
+                addQueryCondition(query, field, operator, Number(value));
             } else if (key.endsWith('!')) {
                 const field = key.slice(0, -1);
-                if (!query[field]) query[field] = {};
-                query[field].$nin = query[field].$nin || [];
-                query[field].$nin.push(value);
+                if (isNaN(Number(value))) {
+                    const regex = new RegExp(`^${value}$`, 'i');
+                    query[field] = { $not: regex }; // Use $not with $regex for case-insensitive exclusion
+                }
             } else {
                 const field = key;
                 if (isNaN(Number(value))) {
-                    // Apply regex for string fields
                     const regex = new RegExp(`^${value}$`, 'i');
-                    query[field] = { $regex: regex };
+                    addQueryCondition(query, field, '$regex', regex);
                 } else {
-                    // Direct assignment for numeric fields
-                    query[field] = Number(value);
+                    addQueryCondition(query, field, null, Number(value));
                 }
             }
         });
@@ -121,13 +118,18 @@ const addQueryCondition = (query, field, operator, value, isArray = false) => {
     if (!query[field]) {
         query[field] = {};
     }
-    if (isArray) {
-        if (!query[field][operator]) {
-            query[field][operator] = [];
+
+    if (operator) {
+        if (isArray) {
+            if (!query[field][operator]) {
+                query[field][operator] = [];
+            }
+            query[field][operator].push(value);
+        } else {
+            query[field][operator] = value;
         }
-        query[field][operator].push(value);
     } else {
-        query[field][operator] = value;
+        query[field] = value;
     }
 };
 

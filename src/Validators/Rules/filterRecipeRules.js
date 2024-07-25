@@ -24,10 +24,17 @@ const filterRecipeValidationRules = () => [
     
     query('RecipeName').optional().isString().trim().escape(),
 
-    query('DietaryRequirements').optional().custom(value => {
-        const requirements = Array.isArray(value) ? value : [value];
+    query('DietaryRequirements').optional().custom((value) => {
+        let requirements;
+        if (typeof value === 'string') {
+          requirements = value.split(',').map(item => item.trim());
+        } else if (Array.isArray(value)) {
+          requirements = value.flatMap(item => item.split(',').map(subItem => subItem.trim()));
+        } else {
+          requirements = [value];
+        }
         return requirements.every(req => DIETARY_REQUIREMENT_ENUMS.includes(req));
-    }).withMessage(`Invalid dietary requirement. Must be one of: ${DIETARY_REQUIREMENT_ENUMS.join(', ')}`),
+      }).withMessage(`Invalid dietary requirement. Must be one of: ${DIETARY_REQUIREMENT_ENUMS.join(', ')}`),
 
     query('ServingSize').optional().isInt({ min: 1 })
         .withMessage('Serving size must be a positive integer'),
