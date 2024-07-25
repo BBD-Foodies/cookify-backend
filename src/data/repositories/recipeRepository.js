@@ -70,25 +70,42 @@ const updateRecipeById = async (id, updateData, userName) => {
 
 const findByFilters = async (filters, req) => {
     const query = {};
+
     Object.keys(filters).forEach(key => {
-        const values = filters[key].split(',');
+        let values = filters[key];
+
+        if (typeof values === 'string') {
+            values = values.split(',');
+        }
+
         values.forEach(value => {
-            if (value) {
-                if (key.startsWith('Ingredients')) {
-                    if (key.endsWith('!')) {
-                        key = "Ingredients.name!"
-                    }
-                    else { key = "Ingredients.name" }
-                }
-                if (key.endsWith('_lt') || key.endsWith('_gt')) {
-                    const field = key.slice(0, -3);
-                    const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                    query[field] = { [operator]: value };
-                } else if (key.endsWith('!')) {
-                    const field = key.slice(0, -1);
-                    addQueryCondition(query, field, '$nin', value);
+            if (!value) return;
+
+            // Handle Ingredients fields
+            if (key.startsWith('Ingredients')) {
+                key = key.endsWith('!') ? 'Ingredients.name!' : 'Ingredients.name';
+            }
+
+            // Handle comparison operators
+            if (key.endsWith('_lt') || key.endsWith('_gt')) {
+                const field = key.slice(0, -3);
+                const operator = key.endsWith('_lt') ? '$lt' : '$gt';
+                if (!query[field]) query[field] = {};
+                query[field][operator] = Number(value);
+            } else if (key.endsWith('!')) {
+                const field = key.slice(0, -1);
+                if (!query[field]) query[field] = {};
+                query[field].$nin = query[field].$nin || [];
+                query[field].$nin.push(value);
+            } else {
+                const field = key;
+                if (isNaN(Number(value))) {
+                    // Apply regex for string fields
+                    const regex = new RegExp(`^${value}$`, 'i');
+                    query[field] = { $regex: regex };
                 } else {
-                    addQueryCondition(query, key, '$all', value);
+                    // Direct assignment for numeric fields
+                    query[field] = Number(value);
                 }
             }
         });
@@ -97,13 +114,21 @@ const findByFilters = async (filters, req) => {
     return {
         total: await Recipe.countDocuments(query),
         data: await pagination(Recipe.find(query), req)
-    }
+    };
 };
 
-const addQueryCondition = (query, field, operator, value) => {
-    if (!query[field]) query[field] = {};
-    if (!query[field][operator]) query[field][operator] = [];
-    query[field][operator].push(value);
+const addQueryCondition = (query, field, operator, value, isArray = false) => {
+    if (!query[field]) {
+        query[field] = {};
+    }
+    if (isArray) {
+        if (!query[field][operator]) {
+            query[field][operator] = [];
+        }
+        query[field][operator].push(value);
+    } else {
+        query[field][operator] = value;
+    }
 };
 
 const groupByAttribute = (attribute) => {
