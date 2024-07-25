@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { updateRecipeValidationRules, postRecipeValidationRules, filterRecipeValidationRules, groupByValidationRules } = require('../utils/validationUtils');
+const { updateRecipeValidationRules, postRecipeValidationRules, filterRecipeValidationRules, groupByValidationRules } = require('../Validators/index.js');
 const mongoose = require('mongoose');
 
 const handleValidationErrors = (req, res, next) => {

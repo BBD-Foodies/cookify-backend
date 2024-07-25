@@ -17,13 +17,13 @@ router.get('/search', setPagination, searchRecipe);
 
 router.get('/group', groupByValidators, getGroupedRecipes);
 
-router.get('/:id', validateObjectId, getRecipeById);
-
-router.delete('/:id', validateObjectId, deleteRecipeById);
-
 router.post('/', postRecipeValidators, addRecipes);
 
 router.get('/', setPagination, filterRecipeValidators, getRecipesByFilters);
+
+router.get('/:id', validateObjectId, getRecipeById);
+
+router.delete('/:id', validateObjectId, deleteRecipeById);
 
 router.patch('/:id', validateObjectId, updateRecipeValidators, updateRecipe);
 

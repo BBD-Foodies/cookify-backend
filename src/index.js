@@ -1,9 +1,9 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const connectDatabase = require('./data/dbConfig'); // Import the DB configuration
-const recipeRoutes = require('./Routes/recipeRoutes'); // Import the recipe routes
-const authRoutes = require('./Routes/authRoutes');
+const connectDatabase = require('./data/config/dbConfig'); // Import the DB configuration
+const recipeRoutes = require('./routes/recipeRoutes');
+const authRoutes = require('./routes/authRoutes');
 const verifyToken = require( "./Middleware/authMiddleware");
 
 const app = express();
@@ -35,7 +35,7 @@ app.get('/health-check', verifyToken, (req, res) => {
 });
 
 
-app.get('/ping', (req, res) => {
+app.get('/pingPong', (req, res) => {
     res.send('Pong');
 });
 

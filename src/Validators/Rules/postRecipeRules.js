@@ -1,6 +1,5 @@
-const { body, query } = require('express-validator');
-const { MEAL_TYPE_ENUMS, MEASUREMENT_ENUMS, VALID_FIELDS, GROUP_BY_FIELDS, UPDATE_ALLOWED_FIELDS } = require('../data/config/enums');
-
+const { body } = require('express-validator');
+const { MEAL_TYPE_ENUMS, MEASUREMENT_ENUMS } = require('../Config/enums');
 
 const postRecipeValidationRules = () => [
     body('RecipeName').exists().withMessage('Recipe name is required')
@@ -47,54 +46,4 @@ const postRecipeValidationRules = () => [
         .trim().escape(),
 ];
 
-const updateRecipeValidationRules = () => [
-    body('*').custom((value, { path }) => {
-        if (!UPDATE_ALLOWED_FIELDS.includes(path)) {
-            throw new Error(`Invalid update field: ${path}`);
-        }
-        return true;
-    }),
-    body('RecipeName').optional().isString().trim().escape(),
-    body('Categories').optional().isArray().withMessage('Categories must be an array'),
-    body('Categories.*').isString().trim().escape(),
-    body('MealType').optional().isIn(MEAL_TYPE_ENUMS).withMessage('Invalid meal type'),
-    body('Allergens').optional().isArray().withMessage('Allergens must be an array'),
-    body('Allergens.*').isString().trim().escape(),
-    body('DietaryRequirements').optional().isArray().withMessage('Dietary requirements must be an array'),
-    body('DietaryRequirements.*').isString().trim().escape(),
-    body('ServingSize').optional().isInt({ min: 1 }).withMessage('Serving size must be a positive integer'),
-    body('PrepTime').optional().isInt({ min: 0 }).withMessage('Prep time must be a non-negative integer'),
-    body('Ingredients').optional().isArray().withMessage('Ingredients must be an array'),
-    body('Ingredients.*.name').isString().trim().escape(),
-    body('Ingredients.*.quantity').isInt({ min: 1 }).withMessage('Ingredient quantity must be a non-negative number'),
-    body('Ingredients.*.measurement').isIn(MEASUREMENT_ENUMS).withMessage('Invalid measurement unit'),
-    body('Steps').optional().isArray().withMessage('Ingredients must be an array'),
-    body('Steps.*.step').isInt({ min: 1 }).withMessage('Step number must be a non-negative number'),
-    body('Steps.*.instruction').isString().trim().escape(),
-];
-
-const filterRecipeValidationRules = () => [
-    query('*').custom((value, { path }) => {
-        if (!VALID_FIELDS.includes(path.replace(/_[lg]t$/, '').replace(/!$/, ''))) {
-            throw new Error(`Invalid filter parameter: ${path}`);
-        }
-        return true;
-    }),
-    query('MealType').optional().isIn(MEAL_TYPE_ENUMS),
-    query('Ingredients.*.measurement').optional().isIn(MEASUREMENT_ENUMS),
-
-];
-
-
-const groupByValidationRules = () => [
-    query('attribute').exists().withMessage('Grouping attribute is required')
-                     .isIn(GROUP_BY_FIELDS).withMessage('Invalid grouping attribute')
-];
-
-
-module.exports = {
-    groupByValidationRules,
-    filterRecipeValidationRules,
-    postRecipeValidationRules,
-    updateRecipeValidationRules
-};
+module.exports = { postRecipeValidationRules }
