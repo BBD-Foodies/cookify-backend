@@ -4,6 +4,7 @@ const YAML = require('yamljs');
 const connectDatabase = require('./data/dbConfig'); // Import the DB configuration
 const recipeRoutes = require('./routes/recipeRoutes'); // Import the recipe routes
 const authRoutes = require('./routes/authRoutes');
+const enumRoutes = require('./routes/enumRoutes');
 const verifyToken = require( "./Middleware/authMiddleware");
 
 const app = express();
@@ -42,6 +43,8 @@ app.get('/ping', (req, res) => {
 app.use('/api',  authRoutes);
 
 app.use('/api/recipes', verifyToken, recipeRoutes);
+
+app.use('/api/enums', verifyToken, enumRoutes);
 
 
 app.listen(port, () => {
