@@ -4,6 +4,7 @@ const YAML = require('yamljs');
 const connectDatabase = require('./data/config/dbConfig');
 const recipeRoutes = require('./routes/recipeRoutes');
 const authRoutes = require('./routes/authRoutes');
+const enumRoutes = require('./routes/enumRoutes');
 const verifyToken = require( "./Middleware/authMiddleware");
 const corsMiddleware = require("./Middleware/corsMiddleware");
 const rateLimiterMiddleware = require('./Middleware/rateLimiterMiddleware');
@@ -47,6 +48,8 @@ app.get('/pingPong', (req, res) => {
 app.use('/api',  authRoutes);
 
 app.use('/api/recipes', verifyToken, recipeRoutes);
+
+app.use('/api/enums', verifyToken, enumRoutes);
 
 
 app.listen(port, () => {
