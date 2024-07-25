@@ -19,24 +19,22 @@ const findRecipeById = async (recipeId) => {
     }
 };
 
-const searchRecipes = async (searchQuery, req) => {
-    const total = await Recipe.countDocuments(
-        { $text: { $search: searchQuery } },
-        { score: { $meta: "textScore" } }
-    );
+const searchRecipes = async (searchQuery) => {
+    const regex = new RegExp(searchQuery, 'i');
 
-    const data = await pagination(
-        Recipe.find(
-                { $text: { $search: searchQuery } },
-                { score: { $meta: "textScore" } })
-            .sort({
-                score: { $meta: "textScore" }
-            })
-        , req
-    );
-
-    return {data, total};
+    return Recipe.find({
+        $or: [
+            { RecipeName: { $regex: regex } },
+            { Categories: { $regex: regex } },
+            { Allergens: { $regex: regex } },
+            { DietaryRequirements: { $regex: regex } },
+            { RequiredCookware: { $regex: regex } },
+            { 'Steps.instruction': { $regex: regex } },
+            { 'Ingredients.name': { $regex: regex } }
+        ]
+    });
 };
+
 
 const deleteRecipe = async (id, userName) => {
     const recipe = await Recipe.findOne({ _id: id });
