@@ -24,7 +24,7 @@ async function authAndReturnJWT(requestToken) {
         throw error;
     }
 }
-function generateToken(userName,expiresIn = "15m") {
+function generateToken(userName,expiresIn = "60m") {
     let token = JWT_SECRET_KEY;
     return jwt.sign({
         userName: userName,
