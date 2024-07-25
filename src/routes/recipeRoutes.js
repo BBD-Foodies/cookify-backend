@@ -4,7 +4,8 @@ const {
     getRecipesByFilters,
     getGroupedRecipes,
     searchRecipe,
-    getRecipeById
+    getRecipeById,
+    deleteRecipeById
 } = require('../Controllers/recipeController');
 const { recipeQueryValidators, validateObjectId } = require('../utils/validationUtils');
 const setPagination = require('../Middleware/pagination');
@@ -16,6 +17,8 @@ router.get('/search', setPagination, searchRecipe);
 router.get('/group', getGroupedRecipes);
 
 router.get('/:id', validateObjectId, getRecipeById);
+
+router.delete('/:id', validateObjectId, deleteRecipeById);
 
 router.post('/', recipeQueryValidators(), addRecipes);
 

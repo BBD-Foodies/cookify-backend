@@ -1,4 +1,4 @@
-const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById } = require('../data/repositories/recipeRepository');
+const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, deleteRecipe } = require('../data/repositories/recipeRepository');
 const { validate } = require('../utils/validationUtils');
 
 const addRecipes = async (req, res) => {
@@ -33,15 +33,20 @@ const getRecipeById = async (req, res) => {
 };
 
 const deleteRecipeById = async (req, res) => {
-    try {
-        const recipeId = req.params.id;
-        const result = await Recipe.findByIdAndRemove(recipeId);
-        
-        if (!result) {
-            return res.status(404).json({ message: 'Recipe not found' });
-        }
+    const { id } = req.params;
 
-        res.status(204).send(); // No content to send back
+    try {
+        const result = await deleteRecipe(id, req.userName);
+        switch (result) {
+            case 'success':
+                return res.json({ message: "Recipe deleted successfully" });
+            case 'not_found':
+                return res.status(404).json({ message: 'Recipe not found' });
+            case 'unauthorized':
+                return res.status(403).json({ message: 'Unauthorized: You can only delete your own recipes' });
+            default:
+                return res.status(500).json({ message: "Error deleting the recipe" });
+        }
     } catch (error) {
         res.status(500).json({ message: "Error deleting the recipe", error: error.message });
     }
