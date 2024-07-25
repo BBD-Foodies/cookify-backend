@@ -26,7 +26,6 @@ const recipeSchema = new mongoose.Schema({
     Steps: [stepSchema]
 });
 
-//Indexing to allow searches:
 recipeSchema.index({
     RecipeName: 'text',
     Categories: 'text',

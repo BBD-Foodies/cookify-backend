@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+    updateRecipe,
     addRecipes,
     getRecipesByFilters,
     getGroupedRecipes,
@@ -7,21 +8,23 @@ const {
     getRecipeById,
     deleteRecipeById
 } = require('../Controllers/recipeController');
-const { recipeQueryValidators, validateObjectId } = require('../utils/validationUtils');
+const { postRecipeValidators, updateRecipeValidators, validateObjectId, filterRecipeValidators, groupByValidators } = require("../Middleware/validatorMiddleware");
 const setPagination = require('../Middleware/pagination');
 const router = express.Router();
 
 
 router.get('/search', setPagination, searchRecipe);
 
-router.get('/group', getGroupedRecipes);
+router.get('/group', groupByValidators, getGroupedRecipes);
+
+router.post('/', postRecipeValidators, addRecipes);
+
+router.get('/', setPagination, filterRecipeValidators, getRecipesByFilters);
 
 router.get('/:id', validateObjectId, getRecipeById);
 
 router.delete('/:id', validateObjectId, deleteRecipeById);
 
-router.post('/', recipeQueryValidators(), addRecipes);
-
-router.get('/', setPagination, getRecipesByFilters);
+router.patch('/:id', validateObjectId, updateRecipeValidators, updateRecipe);
 
 module.exports = router;

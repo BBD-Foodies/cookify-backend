@@ -4,7 +4,6 @@ const AWS = require('aws-sdk');
 
 const connectDatabase = async () => {
     let dbURI;
-// mongodb://root:password@localhost:27017/foodiedb
     if (process.env.NODE_ENV === 'production') {
         const secretsManager = new AWS.SecretsManager({ region: 'eu-west-1' });
         try {

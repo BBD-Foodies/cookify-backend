@@ -1,5 +1,4 @@
-const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, deleteRecipe } = require('../data/repositories/recipeRepository');
-const { validate } = require('../utils/validationUtils');
+const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, updateRecipeById, deleteRecipe } = require('../data/repositories/recipeRepository');
 
 const addRecipes = async (req, res) => {
     try {
@@ -29,6 +28,27 @@ const getRecipeById = async (req, res) => {
         res.json(recipe);
     } catch (err) {
         res.status(500).json({ message: "Error retrieving the recipe", error: err.message });
+    }
+};
+
+const updateRecipe = async (req, res) => {
+    const { id } = req.params;
+    const updateData = req.body;
+    const userName = req.userName;
+    try {
+        const result = await updateRecipeById(id, updateData, userName);
+        switch (result.status) {
+            case 'success':
+                return res.json({ message: "Recipe updated successfully", data: result.data });
+            case 'not_found':
+                return res.status(404).json({ message: 'Recipe not found' });
+            case 'unauthorized':
+                return res.status(403).json({ message: 'Unauthorized: You can only update your own recipes' });
+            default:
+                return res.status(500).json({ message: 'Unknown error occurred' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error updating the recipe", error: error.message });
     }
 };
 
@@ -69,36 +89,27 @@ const searchRecipe = async (req, res) => {
 };
 
 const getRecipesByFilters = async (req, res) => {
-    const errors = validate(req);
-    if (errors) {
-        return res.status(400).json({ errors });
-    }
-
     try {
         const filters = req.query;
         const recipes = await findByFilters(filters, req);
-        res.json(recipes);
+        res.json({ message: "Recipes retrieved successfully", data: recipes });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error retrieving recipes", error: error.message });
     }
 };
 
 const getGroupedRecipes = async (req, res) => {
-    const errors = validate(req);
-    if (errors) {
-        return res.status(400).json({ errors });
-    }
-
     try {
         const { attribute } = req.query;
         const result = await groupByAttribute(attribute);
         res.json(result);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error retrieving grouped recipes", error: error.message });
     }
 };
 
 module.exports = {
+    updateRecipe,
     deleteRecipeById,
     getRecipeById,
     searchRecipe,
