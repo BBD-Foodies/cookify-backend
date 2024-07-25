@@ -1,5 +1,5 @@
 const { body } = require('express-validator');
-const { MEAL_TYPE_ENUMS, MEASUREMENT_ENUMS, UPDATE_ALLOWED_FIELDS } = require('../Config/enums');
+const { MEAL_TYPE_ENUMS, MEASUREMENT_ENUMS, UPDATE_ALLOWED_FIELDS, DIETARY_REQUIREMENT_ENUMS } = require('../Config/enums');
 
 
 const updateRecipeValidationRules = () => [
@@ -16,6 +16,8 @@ const updateRecipeValidationRules = () => [
     body('Allergens').optional().isArray().withMessage('Allergens must be an array'),
     body('Allergens.*').isString().trim().escape(),
     body('DietaryRequirements').optional().isArray().withMessage('Dietary requirements must be an array'),
+    body('DietaryRequirements').optional()
+    .isIn(DIETARY_REQUIREMENT_ENUMS).withMessage('Invalid dietary requirement'),
     body('DietaryRequirements.*').isString().trim().escape(),
     body('ServingSize').optional().isInt({ min: 1 }).withMessage('Serving size must be a positive integer'),
     body('PrepTime').optional().isInt({ min: 0 }).withMessage('Prep time must be a non-negative integer'),
