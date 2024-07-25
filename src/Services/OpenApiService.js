@@ -49,8 +49,13 @@ const apiCallDalle2 = async (recipeName) => {
 }
 
 const getRecipeGenIcon = async (recipeName) => {
-    const imageUrl = await getImageUrl(recipeName);
-    return imageUrl;
+    try {
+        return (await getImageUrl(recipeName));
+    } catch (error) {
+        const formattedRecipeName = recipeName.replace(/\s+/g, '').toLowerCase();
+        delete imageCache[formattedRecipeName];
+        return 'https://media.gettyimages.com/id/1141797008/vector/table-knife-and-fork-vector.jpg?s=612x612&w=0&k=20&c=ZMscIoKfUiQevWFrxxwnhwZ-MvElVU8XFvmzSfZzolk=';
+    }
 }
 
 module.exports = { getRecipeGenIcon };
