@@ -22,7 +22,7 @@ async function getImageUrl(recipeName) {
     const imageUrl = await apiCallDalle2(formattedRecipeName);
 
     if (imageUrl.mustCache) {
-        imageCache[formattedRecipeName] = imageUrl;
+        imageCache[formattedRecipeName] = imageUrl.image_url;
     }
 
     return imageUrl.image_url;
