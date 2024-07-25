@@ -34,7 +34,7 @@ const apiCallDalle2 = async (recipeName) => {
     try {
         const response = await openai.images.generate({
             model: "dall-e-2",
-            prompt: `${recipeName}, presentable for a recipe blog, hyper-realistic.`,
+            prompt: `${recipeName}, presentable for a recipe blog, hyper-realistic. Focus on the food and its presentation, place it in the center.`,
             n: 1,
             size: "256x256",
         });
