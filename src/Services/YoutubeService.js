@@ -14,7 +14,7 @@ const getRecipeSuggestedVideoLink = async (keyword) => {
         const item = data.items[0];
         const videoId = item.id.videoId;
         const videoTitle = item.snippet.title || 'no data';
-        const videoUrl = `https://www.youtube.com/watch?v=${videoId}` || 'no data';
+        const videoUrl = `https://www.youtube.com/embed/${videoId}` || 'no data';
 
         return {
             videoTitle,
