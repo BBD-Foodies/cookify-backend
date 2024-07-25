@@ -19,10 +19,9 @@ const findRecipeById = async (recipeId) => {
     }
 };
 
-const searchRecipes = async (searchQuery) => {
+const searchRecipes = async (searchQuery, req) => {
     const regex = new RegExp(searchQuery, 'i');
-
-    return Recipe.find({
+    const query = {
         $or: [
             { RecipeName: { $regex: regex } },
             { Categories: { $regex: regex } },
@@ -32,7 +31,12 @@ const searchRecipes = async (searchQuery) => {
             { 'Steps.instruction': { $regex: regex } },
             { 'Ingredients.name': { $regex: regex } }
         ]
-    });
+    };
+
+    const total = await Recipe.countDocuments(query);
+    const data = await pagination(Recipe.find(query), req);
+
+    return {total, data};
 };
 
 
