@@ -20,15 +20,22 @@ const findRecipeById = async (recipeId) => {
 };
 
 const searchRecipes = async (searchQuery, req) => {
-    return pagination(
-        Recipe.find(
-            { $text: { $search: searchQuery } },
-            { score: { $meta: "textScore" } }
-        ).sort({
-            score: { $meta: "textScore" }
-        }), 
-        req
+    const total = await Recipe.countDocuments(
+        { $text: { $search: searchQuery } },
+        { score: { $meta: "textScore" } }
     );
+
+    const data = await pagination(
+        Recipe.find(
+                { $text: { $search: searchQuery } },
+                { score: { $meta: "textScore" } })
+            .sort({
+                score: { $meta: "textScore" }
+            })
+        , req
+    );
+
+    return {data, total};
 };
 
 const deleteRecipe = async (id, userName) => {
@@ -59,7 +66,7 @@ const updateRecipeById = async (id, updateData, userName) => {
 };
 
 
-const findByFilters = (filters, req) => {
+const findByFilters = async (filters, req) => {
     const query = {};
     Object.keys(filters).forEach(key => {
         const values = filters[key].split(',');
@@ -79,12 +86,16 @@ const findByFilters = (filters, req) => {
                     const field = key.slice(0, -1);
                     addQueryCondition(query, field, '$nin', value);
                 } else {
-                    addQueryCondition(query, key, '$all', value, true);
+                    addQueryCondition(query, key, '$all', value);
                 }
             }
         });
     });
-    return pagination(Recipe.find(query), req)
+
+    return {
+        total: await Recipe.countDocuments(query),
+        data: await pagination(Recipe.find(query), req)
+    }
 };
 
 const addQueryCondition = (query, field, operator, value) => {
