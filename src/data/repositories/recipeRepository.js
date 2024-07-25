@@ -83,7 +83,7 @@ const findByFilters = async (filters, req) => {
                 if (key.endsWith('_lt') || key.endsWith('_gt')) {
                     const field = key.slice(0, -3);
                     const operator = key.endsWith('_lt') ? '$lt' : '$gt';
-                    addQueryCondition(query, field, operator, Number(value));
+                    query[field] = { [operator]: value };
                 } else if (key.endsWith('!')) {
                     const field = key.slice(0, -1);
                     addQueryCondition(query, field, '$nin', value);
