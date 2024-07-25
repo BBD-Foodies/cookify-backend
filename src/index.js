@@ -5,6 +5,8 @@ const connectDatabase = require('./data/config/dbConfig');
 const recipeRoutes = require('./routes/recipeRoutes');
 const authRoutes = require('./routes/authRoutes');
 const verifyToken = require( "./Middleware/authMiddleware");
+const corsMiddleware = require("./Middleware/corsMiddleware");
+const rateLimiterMiddleware = require('./Middleware/rateLimiterMiddleware');
 
 const app = express();
 let dbConnected = false;
@@ -20,6 +22,9 @@ const port = process.env.PORT || 5000;
 
 
 app.use(express.json());
+
+app.use(corsMiddleware);
+app.use(rateLimiterMiddleware);
 
 
 const swaggerDocument = YAML.load('./swagger/swagger.yaml');
