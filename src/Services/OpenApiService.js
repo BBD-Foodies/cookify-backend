@@ -25,7 +25,7 @@ async function getImageUrl(recipeName) {
         imageCache[formattedRecipeName] = imageUrl;
     }
 
-    return imageUrl.imageUrl;
+    return imageUrl.image_url;
 }
 
 const apiCallDalle2 = async (recipeName) => {
