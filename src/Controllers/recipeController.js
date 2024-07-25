@@ -85,7 +85,7 @@ const searchRecipe = async (req, res) => {
         }
 
         res.json({
-            message: "Recipe deleted successfully" ,
+            message: "Recipes retrieved successfully",
             hasNext,
             data: recipes.data,
         });
