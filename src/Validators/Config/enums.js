@@ -8,9 +8,12 @@ const VALID_FIELDS = ['RecipeName', 'Categories', 'Allergens', 'DietaryRequireme
 
 const GROUP_BY_FIELDS = ['MealType', 'Categories', 'Allergens', 'DietaryRequirements'];
 
+const FILTER_BY_FIELDS = ['RecipeName', 'Categories', 'Allergens', 'DietaryRequirements', 'MealType', 'Ingredients', 'ServingSize', 'RequiredCookware', 'Steps', 'PrepTimeMax', 'PrepTimeMin'];
+
 const UPDATE_ALLOWED_FIELDS = ['RecipeName', 'Categories', 'Allergens', 'DietaryRequirements', 'MealType', 'Ingredients', 'ServingSize', 'RequiredCookware', 'Steps', 'PrepTimeMax', 'PrepTimeMin'];
 
 module.exports = {
+    FILTER_BY_FIELDS,
     UPDATE_ALLOWED_FIELDS,
     GROUP_BY_FIELDS,
     MEAL_TYPE_ENUMS,

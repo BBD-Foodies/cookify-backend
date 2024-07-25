@@ -85,6 +85,7 @@ const searchRecipe = async (req, res) => {
         }
 
         res.json({
+            message: "Recipe deleted successfully" ,
             hasNext,
             data: recipes.data,
         });
@@ -101,15 +102,18 @@ const getRecipesByFilters = async (req, res) => {
         const hasNext = recipes.total > req.currentPage * req.perPage;
         res.json({ message: "Recipes retrieved successfully", hasNext, data: recipes.data });
     } catch (error) {
-        res.status(500).json({ message: "Error retrieving recipes", error: error.message });
+        return res.status(500).json({ message: "Error retrieving recipes", error: error.message });
     }
 };
 
 const getGroupedRecipes = async (req, res) => {
     try {
         const { attribute } = req.query;
-        const result = await groupByAttribute(attribute);
-        res.json(result);
+        const recipes = await groupByAttribute(attribute);
+        if (recipes.length == 0) {
+            return res.status(200).json({ message: "No recipes fitting your requirements were found.", data: [] });
+        }
+        res.json({message: "Recipes retrieved successfully", data: recipes});
     } catch (error) {
         res.status(500).json({ message: "Error retrieving grouped recipes", error: error.message });
     }
