@@ -9,7 +9,7 @@ const ingredientSchema = new mongoose.Schema({
 const stepSchema = new mongoose.Schema({
     step: { type: Number, required: true },
     instruction: { type: String, required: true }
-});
+}); 
 
 const recipeSchema = new mongoose.Schema({
     AuthorName: { type: String, required: true },
