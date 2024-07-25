@@ -1,9 +1,11 @@
 const { addRecipe, findByFilters, groupByAttribute, searchRecipes, findRecipeById, updateRecipeById, deleteRecipe } = require('../data/repositories/recipeRepository');
+const { getRecipeSuggestedVideoLink } = require('../Services/YoutubeService');
+const { getRecipeGenIcon } = require('../Services/OpenApiService');
 
 const addRecipes = async (req, res) => {
     try {
         const authorName = req.userName;
-        
+
         const recipeData = {
             ...req.body,
             AuthorName: authorName
@@ -84,11 +86,11 @@ const searchRecipe = async (req, res) => {
 
         res.json({
             hasNext,
-            data: recipes.data, 
+            data: recipes.data,
         });
     } catch (err) {
-        console.error("Server Error:", err); 
-        res.status(500).send({ message: "Error retrieving recipes", error: err.message }); 
+        console.error("Server Error:", err);
+        res.status(500).send({ message: "Error retrieving recipes", error: err.message });
     }
 };
 
@@ -113,6 +115,28 @@ const getGroupedRecipes = async (req, res) => {
     }
 };
 
+const getVideoLink = async (req, res) => {
+    try {
+        const searchQuery = req.query.q;
+        const youtubeInfo = await getRecipeSuggestedVideoLink(searchQuery);
+        res.json(youtubeInfo);
+    } catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).send({ message: "Error retrieving recipe video link", error: err.message });
+    }
+};
+
+const getRecipeIconAi = async (req, res) => {
+    try {
+        const searchQuery = req.query.q;
+        const iconLink = await getRecipeGenIcon(searchQuery);
+        res.json(iconLink);
+    } catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).send({ message: "Error retrieving recipe icon", error: err.message });
+    }
+};
+
 module.exports = {
     updateRecipe,
     deleteRecipeById,
@@ -120,5 +144,7 @@ module.exports = {
     searchRecipe,
     addRecipes,
     getRecipesByFilters,
-    getGroupedRecipes
+    getGroupedRecipes,
+    getVideoLink,
+    getRecipeIconAi,
 };

@@ -6,14 +6,21 @@ const {
     getGroupedRecipes,
     searchRecipe,
     getRecipeById,
-    deleteRecipeById
+    deleteRecipeById,
+    getVideoLink,
+    getRecipeIconAi,
 } = require('../Controllers/recipeController');
+getVideoLink
 const { postRecipeValidators, updateRecipeValidators, validateObjectId, filterRecipeValidators, groupByValidators } = require("../Middleware/validatorMiddleware");
 const setPagination = require('../Middleware/pagination');
 const router = express.Router();
 
 
 router.get('/search', setPagination, searchRecipe);
+
+router.get('/video', getVideoLink);
+
+router.get('/icon', getRecipeIconAi);
 
 router.get('/group', groupByValidators, getGroupedRecipes);
 
