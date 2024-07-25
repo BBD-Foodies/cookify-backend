@@ -29,7 +29,7 @@ async function getImageUrl(recipeName) {
 }
 
 const apiCallDalle2 = async (recipeName) => {
-    let image_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzCYkTtbFS6mH-PZ5e8f5vV7dD1sEOUZeMmQ&s';
+    let image_url = 'https://media.gettyimages.com/id/1141797008/vector/table-knife-and-fork-vector.jpg?s=612x612&w=0&k=20&c=ZMscIoKfUiQevWFrxxwnhwZ-MvElVU8XFvmzSfZzolk=';
     let mustCache = false;
     try {
         const response = await openai.images.generate({
@@ -42,7 +42,7 @@ const apiCallDalle2 = async (recipeName) => {
         mustCache = true;
     } catch (error) {
         console.error('Could not get AI image.');
-        image_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzCYkTtbFS6mH-PZ5e8f5vV7dD1sEOUZeMmQ&s';
+        image_url = 'https://media.gettyimages.com/id/1141797008/vector/table-knife-and-fork-vector.jpg?s=612x612&w=0&k=20&c=ZMscIoKfUiQevWFrxxwnhwZ-MvElVU8XFvmzSfZzolk=';
         mustCache = false;
     }
     return { image_url, mustCache };
