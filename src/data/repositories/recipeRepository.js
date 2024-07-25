@@ -19,10 +19,9 @@ const findRecipeById = async (recipeId) => {
     }
 };
 
-const searchRecipes = async (searchQuery) => {
+const searchRecipes = async (searchQuery, req) => {
     const regex = new RegExp(searchQuery, 'i');
-
-    return Recipe.find({
+    const query = {
         $or: [
             { RecipeName: { $regex: regex } },
             { Categories: { $regex: regex } },
@@ -32,7 +31,12 @@ const searchRecipes = async (searchQuery) => {
             { 'Steps.instruction': { $regex: regex } },
             { 'Ingredients.name': { $regex: regex } }
         ]
-    });
+    };
+
+    const total = await Recipe.countDocuments(query);
+    const data = await pagination(Recipe.find(query), req);
+
+    return {total, data};
 };
 
 
@@ -64,7 +68,7 @@ const updateRecipeById = async (id, updateData, userName) => {
 };
 
 
-const findByFilters = (filters, req) => {
+const findByFilters = async (filters, req) => {
     const query = {};
     Object.keys(filters).forEach(key => {
         const values = filters[key].split(',');
@@ -84,12 +88,16 @@ const findByFilters = (filters, req) => {
                     const field = key.slice(0, -1);
                     addQueryCondition(query, field, '$nin', value);
                 } else {
-                    addQueryCondition(query, key, '$all', value, true);
+                    addQueryCondition(query, key, '$all', value);
                 }
             }
         });
     });
-    return pagination(Recipe.find(query), req)
+
+    return {
+        total: await Recipe.countDocuments(query),
+        data: await pagination(Recipe.find(query), req)
+    }
 };
 
 const addQueryCondition = (query, field, operator, value) => {

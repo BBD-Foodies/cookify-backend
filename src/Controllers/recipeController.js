@@ -76,12 +76,16 @@ const searchRecipe = async (req, res) => {
     try {
         const searchQuery = req.query.q;
         const recipes = await searchRecipes(searchQuery, req)
+        const hasNext = recipes.total > req.currentPage * req.perPage;
 
-        if (!recipes.length) {
+        if (!recipes.data.length) {
             return res.status(404).send({ message: 'No recipes found matching your criteria.' });
         }
 
-        res.json(recipes);
+        res.json({
+            hasNext,
+            data: recipes.data, 
+        });
     } catch (err) {
         console.error("Server Error:", err); 
         res.status(500).send({ message: "Error retrieving recipes", error: err.message }); 
@@ -92,7 +96,8 @@ const getRecipesByFilters = async (req, res) => {
     try {
         const filters = req.query;
         const recipes = await findByFilters(filters, req);
-        res.json({ message: "Recipes retrieved successfully", data: recipes });
+        const hasNext = recipes.total > req.currentPage * req.perPage;
+        res.json({ message: "Recipes retrieved successfully", hasNext, data: recipes.data });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving recipes", error: error.message });
     }
