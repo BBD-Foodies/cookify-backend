@@ -31,6 +31,19 @@ const searchRecipes = async (searchQuery, req) => {
     );
 };
 
+const deleteRecipe = async (id, userName) => {
+    const recipe = await Recipe.findOne({ _id: id });
+    if (!recipe) {
+        return 'not_found';
+    }
+    if (recipe.AuthorName !== userName) {
+        return 'unauthorized';
+    }
+
+    const result = await Recipe.findByIdAndDelete(id);
+    return (result) ? 'success' : 'error'
+};
+
 const findByFilters = (filters, req) => {
     const query = {};
     Object.keys(filters).forEach(key => {
@@ -84,5 +97,6 @@ module.exports = {
     searchRecipes,
     addRecipe,
     findByFilters,
-    groupByAttribute
+    groupByAttribute,
+    deleteRecipe
 };
