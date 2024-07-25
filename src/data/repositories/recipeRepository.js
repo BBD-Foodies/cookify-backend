@@ -1,5 +1,5 @@
 const { pagination } = require('../../Services/PaginationService');
-const Recipe = require('../Models/Recipe');
+const Recipe = require('../models/Recipe');
 
 const addRecipe = async (recipeData) => {
     try {
