@@ -23,9 +23,9 @@ exports.githubCallback = async (req, res) => {
                 Accept: 'application/json'
             }
         });
-        console.log(JSON.stringify(process.env.GITHUB_CLIENT_ID));
-        console.log(JSON.stringify(process.env.GITHUB_CLIENT_SECRET));
-        console.log(JSON.stringify(tokenResponse));
+        // console.log(JSON.stringify(process.env.GITHUB_CLIENT_ID));
+        // console.log(JSON.stringify(process.env.GITHUB_CLIENT_SECRET));
+        console.log(tokenResponse);
 
         const accessToken = tokenResponse.data.access_token;
         const userData = await authAndReturnJWT(accessToken);
