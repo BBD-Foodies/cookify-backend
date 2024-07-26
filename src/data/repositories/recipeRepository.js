@@ -67,8 +67,7 @@ const updateRecipeById = async (id, updateData, userName) => {
     return { status: 'success', data: savedRecipe };
 };
 
-
-findByFilters = async (filters, req) => {
+const findByFilters = async (filters, req) => {
     const query = {};
 
     Object.keys(filters).forEach(key => {
@@ -78,14 +77,16 @@ findByFilters = async (filters, req) => {
             values = values.split(',');
         }
 
-        values.forEach(value => {
+        if (values.length > 1) {
+            query[key] = { $all: values.map(value => new RegExp(`^${value}$`, 'i')) };
+        } else {
+            const value = values[0];
             if (!value) return;
 
             if (key.startsWith('Ingredients')) {
                 key = key.endsWith('!') ? 'Ingredients.name!' : 'Ingredients.name';
             }
 
-            // Handle comparison operators
             if (key.endsWith('_lt') || key.endsWith('_gt')) {
                 const field = key.slice(0, -3);
                 const operator = key.endsWith('_lt') ? '$lt' : '$gt';
@@ -94,7 +95,7 @@ findByFilters = async (filters, req) => {
                 const field = key.slice(0, -1);
                 if (isNaN(Number(value))) {
                     const regex = new RegExp(`^${value}$`, 'i');
-                    query[field] = { $not: regex }; // Use $not with $regex for case-insensitive exclusion
+                    query[field] = { $not: regex }; 
                 }
             } else {
                 const field = key;
@@ -105,7 +106,7 @@ findByFilters = async (filters, req) => {
                     addQueryCondition(query, field, null, Number(value));
                 }
             }
-        });
+        }
     });
 
     return {
