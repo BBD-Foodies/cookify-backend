@@ -1,11 +1,11 @@
 
 const express = require('express');
 const router = express.Router();
-const {authAndReturnJWT}= require('../Services/JWTService.js');
+const { authAndReturnJWT } = require('../Services/JWTService.js');
 const axios = require('axios');
 
 exports.githubCallback = async (req, res) => {
-    const { code } = req.query;
+    const { code } = req.query.code;
     if (!code) {
         return res.status(400).send('No code provided');
     }
@@ -24,7 +24,7 @@ exports.githubCallback = async (req, res) => {
         const accessToken = tokenResponse.data.access_token;
         const userData = await authAndReturnJWT(accessToken);
 
-        res.status(200).send({message: "Authenticated successfully", accessToken: userData.jwt});
+        res.status(200).send({ message: "Authenticated successfully", accessToken: userData.jwt });
     } catch (error) {
         console.error('Error in OAuth callback:', error);
         res.status(400).send('Authentication failed, invalid code given.');
