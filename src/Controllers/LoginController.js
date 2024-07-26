@@ -5,7 +5,10 @@ const { authAndReturnJWT } = require('../Services/JWTService.js');
 const axios = require('axios');
 
 exports.githubCallback = async (req, res) => {
-    const { code } = req.query.code;
+    const { code } = req.query;
+
+    console.log(code);
+
     if (!code) {
         return res.status(400).send('No code provided');
     }
@@ -20,6 +23,9 @@ exports.githubCallback = async (req, res) => {
                 Accept: 'application/json'
             }
         });
+        console.log(JSON.stringify(process.env.GITHUB_CLIENT_ID));
+        console.log(JSON.stringify(process.env.GITHUB_CLIENT_SECRET));
+        console.log(JSON.stringify(tokenResponse));
 
         const accessToken = tokenResponse.data.access_token;
         const userData = await authAndReturnJWT(accessToken);
