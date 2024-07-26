@@ -40,3 +40,13 @@ exports.githubCallback = async (req, res) => {
 exports.validateToken = (req, res) => {
     res.json({ valid: true, user: { userName: req.userName } });
 };
+
+exports.devAuth = async (request, result) => {
+    const requestToken = request.header('Authorization');
+    try {
+        const userData = await authAndReturnJWT(requestToken);
+         result.json(userData);
+    } catch (error) {
+        result.status(400).send(error.message);
+    }
+};
